@@ -1,0 +1,25 @@
+# Dependencies - restored with "npm install"
+node_modules/
+
+# Compiled output - rebuilt with "npm run build" and "ng build"
+/backend/dist/
+/frontend/dist/
+/frontend/.angular/
+
+# Pictures uploaded while the app runs: multer names them "<timestamp>-<original name>".
+# The default pictures and the demo ones stay tracked, so the folder exists after a clone.
+/backend/uploads/[0-9]*-*
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editors
+.vscode/*
+!.vscode/settings.json
+.idea/
+
+# Windows and macOS
+Thumbs.db
+Desktop.ini
+.DS_Store
