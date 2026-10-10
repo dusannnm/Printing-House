@@ -1,6 +1,6 @@
 # Printing House
 
-Web platform for print shops, built as the project for **Programiranje internet aplikacija (PIA)**,
+Web platform for print shops, built as the project for the course **Internet Applications Programming (srb. PIA - Programiranje internet aplikacija)**,
 School of Electrical Engineering, University of Belgrade, 2025/26.
 
 Print shops publish their products and the types of print they offer. Clients search those products,
