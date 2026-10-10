@@ -1,0 +1,32 @@
+<div class="app-shell">
+  <app-header-public />
+
+  <main class="page">
+    <h1>Administration</h1>
+    <p class="lead">This form is only for the administrator of the web system.</p>
+
+    <div class="card card-narrow">
+      <form (ngSubmit)="login()">
+        <div class="form-row">
+          <label for="username">Username</label>
+          <input id="username" type="text" name="username" [(ngModel)]="username" required />
+        </div>
+
+        <div class="form-row">
+          <label for="password">Password</label>
+          <input id="password" type="password" name="password" [(ngModel)]="password" required />
+        </div>
+
+        <div class="btn-row">
+          <button type="submit" class="btn">Log in</button>
+        </div>
+      </form>
+
+      @if (message) {
+        <div class="message message-error">{{ message }}</div>
+      }
+    </div>
+  </main>
+
+  <app-footer />
+</div>

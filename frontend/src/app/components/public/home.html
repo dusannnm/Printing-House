@@ -1,0 +1,134 @@
+<div class="app-shell">
+  <app-header-public />
+
+  <main class="page">
+    <h1>Printing House</h1>
+    <p class="lead">Platform for print shops, their clients and their orders.</p>
+
+    <div class="home-layout">
+      <section>
+        <div class="card stat-card">
+          <span class="stat-number">{{ printerCount }}</span>
+          <span>{{ printerCount === 1 ? 'print shop is' : 'print shops are' }} registered on the platform</span>
+        </div>
+
+        <h2>Top 5 products</h2>
+        <p class="lead">The best rated products, by the number of likes clients left.</p>
+
+        @if (topProducts.length === 0) {
+          <div class="card"><p class="empty">There are no products to show yet.</p></div>
+        } @else {
+          <div class="product-grid">
+            @for (product of topProducts; track product.code) {
+              <div class="card product-card">
+                <img [src]="uploadsUrl + '/' + product.main_image" [alt]="product.name" />
+                <strong>{{ product.name }}</strong>
+                <span class="muted">{{ product.printer_name }}, {{ product.printer_city }}</span>
+                <span class="reactions">
+                  <span class="likes">{{ product.likes }} likes</span>
+                  <span class="dislikes">{{ product.dislikes }} dislikes</span>
+                </span>
+                <button type="button" class="btn btn-secondary" (click)="openDetails(product)">
+                  DETAILS
+                </button>
+              </div>
+            }
+          </div>
+        }
+
+        <h2>Search products</h2>
+        <p class="lead">Only products the print shops currently have on stock are offered.</p>
+
+        <div class="card">
+          <form (ngSubmit)="search()">
+            <div class="form-grid">
+              <div class="form-row">
+                <label for="searchName">Product name</label>
+                <input id="searchName" type="text" name="searchName" [(ngModel)]="searchName"
+                       placeholder="Part of the name is enough" />
+              </div>
+
+              <div class="form-row">
+                <label for="searchCategory">Category</label>
+                <select id="searchCategory" name="searchCategory" [(ngModel)]="searchCategory">
+                  <option value="">All categories</option>
+                  @for (category of categories; track category) {
+                    <option [value]="category">{{ category }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="form-row">
+                <label for="searchCity">City</label>
+                <select id="searchCity" name="searchCity" [(ngModel)]="searchCity">
+                  <option value="">All cities</option>
+                  @for (city of cities; track city) {
+                    <option [value]="city">{{ city }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button type="submit" class="btn">Search</button>
+              <button type="button" class="btn btn-secondary" (click)="resetSearch()">Reset</button>
+            </div>
+          </form>
+        </div>
+
+        @if (searched) {
+          @if (results.length === 0) {
+            <div class="card"><p class="empty">No products match this search.</p></div>
+          } @else {
+            <p class="lead">{{ results.length }} {{ results.length === 1 ? 'product' : 'products' }} found.</p>
+
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th class="sortable" (click)="sortByName()" title="Click to sort alphabetically">
+                      Product {{ sortAscending ? '&#9650;' : '&#9660;' }}
+                    </th>
+                    <th>Category</th>
+                    <th>Print shop</th>
+                    <th>City</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (product of results; track product.code) {
+                    <tr>
+                      <td>{{ product.name }}</td>
+                      <td>{{ product.category }}</td>
+                      <td>{{ product.printer_name }}</td>
+                      <td class="center">{{ product.printer_city }}</td>
+                      <td>
+                        <button type="button" class="btn btn-secondary"
+                                (click)="openDetails(product)">DETAILS</button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        }
+      </section>
+
+      @if (signedIn) {
+        <div class="card card-narrow">
+          <h2 class="card-title">Signed in</h2>
+          <p>You are signed in as <strong>{{ username }}</strong>.</p>
+          <div class="btn-row">
+            <a class="btn" [routerLink]="homeRoute">Go to my pages</a>
+            <button type="button" class="btn btn-secondary" (click)="logout()">Log out</button>
+          </div>
+        </div>
+      } @else {
+        <app-login />
+      }
+    </div>
+  </main>
+
+  <app-footer />
+</div>

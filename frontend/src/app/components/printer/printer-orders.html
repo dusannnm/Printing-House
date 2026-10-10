@@ -1,0 +1,93 @@
+<div class="app-shell">
+  <app-header-printer />
+
+  <main class="page">
+    <h1>Ordered products</h1>
+    <p class="lead">
+      Everything clients ordered from this print shop. Move an invoice forward when
+      the work starts and again when it leaves the shop; the client confirms it arrived.
+    </p>
+
+    @if (message) {
+      <div class="message" [class.message-error]="isError" [class.message-success]="!isError">
+        {{ message }}
+      </div>
+    }
+
+    @if (loaded && orders.length === 0) {
+      <div class="card"><p class="empty">No client has ordered anything yet.</p></div>
+    } @else {
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="sortable" (click)="sortBy('invoice_id')">Invoice</th>
+              <th class="sortable" (click)="sortBy('client_display')">Ordered by</th>
+              <th>Products</th>
+              <th class="sortable" (click)="sortBy('total_amount')">Total</th>
+              <th class="sortable" (click)="sortBy('ordered_at')">Ordered</th>
+              <th class="sortable" (click)="sortBy('status')">Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (order of orders; track order.invoice_id) {
+              <tr>
+                <td class="center">
+                  {{ order.invoice_id }}
+                  @if (order.procurement_id) {
+                    <div><span class="badge">procurement {{ order.procurement_id }}</span></div>
+                  }
+                </td>
+                <td>
+                  <strong>{{ order.client_display }}</strong>
+                  <div class="muted">
+                    {{ order.client_is_institution ? 'legal entity' : 'individual' }},
+                    ordered by {{ order.client_username }}
+                  </div>
+                </td>
+                <td>
+                  <ol class="item-list">
+                    @for (item of order.items; track item.product_code) {
+                      <li>
+                        {{ item.product_name }} ({{ item.quantity }})
+                        <div class="muted">
+                          {{ item.color }}
+                          @if (item.print_type) {
+                            &middot; {{ item.print_type }}
+                          }
+                          @if (item.print_text) {
+                            &middot; text: "{{ item.print_text }}"
+                          }
+                        </div>
+                      </li>
+                    }
+                  </ol>
+                </td>
+                <td class="center"><strong>{{ order.total_amount }}</strong> RSD</td>
+                <td class="center">{{ order.ordered_at.substring(0, 10) }}</td>
+                <td class="center">
+                  {{ statusLabels[order.status] }}
+                  @if (order.handled_by) {
+                    <div class="muted">by {{ order.handled_by }}</div>
+                  }
+                </td>
+                <td class="center">
+                  @if (nextStatusLabel(order)) {
+                    <button type="button" class="btn" (click)="advance(order)">
+                      Move to {{ nextStatusLabel(order) }}
+                    </button>
+                  } @else {
+                    <span class="muted">finished</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </main>
+
+  <app-footer />
+</div>

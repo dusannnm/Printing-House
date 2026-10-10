@@ -1,0 +1,58 @@
+<div class="app-shell">
+  <app-header-public />
+
+  <main class="page">
+    @if (message) {
+      <div class="message message-error">{{ message }}</div>
+      <div class="btn-row">
+        <button type="button" class="btn btn-secondary" (click)="back()">Back to home page</button>
+      </div>
+    }
+
+    @if (product) {
+      <h1>{{ product.name }}</h1>
+      <p class="lead">{{ product.category }}<!--
+        -->@if (product.subcategory) { <span> &middot; {{ product.subcategory }}</span> }</p>
+
+      <div class="details-layout">
+        <img class="product-image" [src]="uploadsUrl + '/' + product.main_image" [alt]="product.name" />
+
+        <div class="card">
+          <div class="table-scroll">
+          <table class="data-table">
+            <tbody>
+              <tr>
+                <th>Print shop</th>
+                <td>{{ product.printer_name }}</td>
+              </tr>
+              <tr>
+                <th>City</th>
+                <td>{{ product.printer_city }}</td>
+              </tr>
+              <tr>
+                <th>Likes</th>
+                <td class="likes">{{ product.likes }}</td>
+              </tr>
+              <tr>
+                <th>Dislikes</th>
+                <td class="dislikes">{{ product.dislikes }}</td>
+              </tr>
+            </tbody>
+          </table>
+          </div>
+
+          <p class="lead">
+            Sign in as a client to see the price, the full description and the types of
+            print this product can be ordered with.
+          </p>
+
+          <div class="btn-row">
+            <button type="button" class="btn btn-secondary" (click)="back()">Back</button>
+          </div>
+        </div>
+      </div>
+    }
+  </main>
+
+  <app-footer />
+</div>

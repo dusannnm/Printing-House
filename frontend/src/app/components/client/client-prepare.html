@@ -1,0 +1,74 @@
+<div class="app-shell">
+  <app-header-client />
+
+  <main class="page">
+    @if (product) {
+      <h1>Prepare {{ product.name }}</h1>
+      <p class="lead">{{ product.printer_name }}, {{ product.printer_city }}</p>
+
+      <div class="details-layout">
+        <img class="product-image" [src]="uploadsUrl + '/' + product.main_image" [alt]="product.name" />
+
+        <div class="card">
+          <form (ngSubmit)="addToCart()">
+            <div class="form-row">
+              <label for="color">Colour</label>
+              <input id="color" type="text" [value]="color" disabled />
+              <span class="hint">Chosen on the details page.</span>
+            </div>
+
+            @if (product.print_services.length > 0) {
+              <div class="form-row">
+                <label for="printType">Type of print</label>
+                <select id="printType" name="printType" [(ngModel)]="printType">
+                  @for (service of product.print_services; track service.service_id) {
+                    <option [value]="service.print_type">
+                      {{ service.print_type }} (+{{ service.extra_price_per_piece }} RSD per piece)
+                    </option>
+                  }
+                </select>
+                @if (chosenService) {
+                  <span class="hint">
+                    The print has to fit into
+                    {{ chosenService.max_width_mm }} x {{ chosenService.max_height_mm }} mm.
+                  </span>
+                }
+              </div>
+
+              <div class="form-row">
+                <label for="printText">Text to print</label>
+                <input id="printText" type="text" name="printText" [(ngModel)]="printText" maxlength="200"
+                       maxlength="60" placeholder="For example: Team Alpha" />
+              </div>
+            } @else {
+              <p class="empty">This print shop offers no print for this product.</p>
+            }
+
+            <div class="form-row">
+              <label for="quantity">Quantity</label>
+              <input id="quantity" type="number" name="quantity" [(ngModel)]="quantity" min="1"
+                     [max]="product.stock_quantity" />
+              <span class="hint">{{ product.stock_quantity }} pieces currently on stock.</span>
+            </div>
+
+            <div class="btn-row">
+              <button type="submit" class="btn">ADD TO CART</button>
+              <button type="button" class="btn btn-secondary" (click)="reset()">RESET</button>
+              <button type="button" class="btn btn-secondary" (click)="back()">BACK</button>
+            </div>
+          </form>
+
+          @if (message) {
+            <div class="message" [class.message-error]="isError" [class.message-success]="!isError">
+              {{ message }}
+            </div>
+          }
+        </div>
+      </div>
+    } @else if (message) {
+      <div class="message message-error">{{ message }}</div>
+    }
+  </main>
+
+  <app-footer />
+</div>

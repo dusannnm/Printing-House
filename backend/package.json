@@ -1,0 +1,30 @@
+{
+  "name": "backend_node",
+  "version": "1.0.0",
+  "description": "backend node",
+  "main": "dist/server.js",
+  "scripts": {
+    "start": "npm run serve",
+    "serve": "node dist/server.js",
+    "build": "tsc",
+    "seed": "node db/seed.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.9.4",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "@types/multer": "^2.2.0",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "image-size": "^2.0.2",
+    "mongodb": "^7.3.0",
+    "mongoose": "^9.7.1",
+    "multer": "^2.3.0"
+  }
+}

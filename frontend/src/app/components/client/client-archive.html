@@ -1,0 +1,106 @@
+<div class="app-shell">
+  <app-header-client />
+
+  <main class="page">
+    <h1>Product archive</h1>
+    <p class="lead">
+      Everything delivered or already received. Confirm what arrived, then leave a
+      like or a dislike and a comment. Click a column header to sort.
+    </p>
+
+    @if (message) {
+      <div class="message" [class.message-error]="isError" [class.message-success]="!isError">
+        {{ message }}
+      </div>
+    }
+
+    @if (loaded && rows.length === 0) {
+      <div class="card"><p class="empty">Nothing has been delivered yet.</p></div>
+    } @else {
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="sortable" (click)="sortBy('product_name')">Product</th>
+              <th class="sortable" (click)="sortBy('quantity')">Quantity</th>
+              <th class="sortable" (click)="sortBy('printer_name')">Print shop</th>
+              <th class="sortable" (click)="sortBy('ordered_at')">Ordered</th>
+              <th class="sortable" (click)="sortBy('invoice_id')">Invoice</th>
+              <th class="sortable" (click)="sortBy('status')">Status</th>
+              <th>Your rating</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows; track row.invoice_id + '-' + row.product_code) {
+              <tr>
+                <td>{{ row.product_name }}</td>
+                <td class="center">{{ row.quantity }}</td>
+                <td>
+                  {{ row.printer_name }}
+                  <div class="muted">{{ row.printer_city }}</div>
+                </td>
+                <td class="center">{{ row.ordered_at.substring(0, 10) }}</td>
+                <td class="center">{{ row.invoice_id }}</td>
+                <td class="center">{{ statusLabels[row.status] }}</td>
+
+                <td>
+                  @if (row.status === RECEIVED) {
+                    <div class="btn-row">
+                      <button type="button"
+                              class="btn"
+                              [class.btn-secondary]="row.my_reaction !== 1"
+                              (click)="react(row, 1)">Like</button>
+                      <button type="button"
+                              class="btn"
+                              [class.btn-danger]="row.my_reaction === -1"
+                              [class.btn-secondary]="row.my_reaction !== -1"
+                              (click)="react(row, -1)">Dislike</button>
+                    </div>
+                    @if (row.my_reaction !== 0) {
+                      <div class="muted">You {{ row.my_reaction === 1 ? 'liked' : 'disliked' }} this. Press the other one to change it.</div>
+                    }
+                  } @else {
+                    <span class="muted">Confirm it arrived first</span>
+                  }
+                </td>
+
+                <td>
+                  <div class="btn-row">
+                    @if (row.status === DELIVERED) {
+                      <button type="button" class="btn" (click)="markReceived(row)"
+                              title="Confirms the whole invoice">Mark received</button>
+                    }
+                    @if (row.status === RECEIVED) {
+                      <button type="button" class="btn btn-secondary" (click)="openComment(row)">
+                        {{ row.has_commented ? 'Comment again' : 'Comment' }}
+                      </button>
+                    }
+                    <button type="button" class="btn btn-secondary" (click)="openDetails(row)">DETAILS</button>
+                  </div>
+
+                  @if (commentingOn === row.product_code) {
+                    <div class="form-row">
+                      <label [attr.for]="'comment_' + row.product_code">Your comment</label>
+                      <textarea [id]="'comment_' + row.product_code" name="commentText" rows="3"
+                                maxlength="500" [(ngModel)]="commentText"></textarea>
+                      <div class="btn-row">
+                        <button type="button" class="btn" (click)="saveComment(row)">Save</button>
+                        <button type="button" class="btn btn-secondary" (click)="cancelComment()">Cancel</button>
+                      </div>
+                    </div>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <p class="lead">
+        Marking a product as received confirms the whole invoice it came on.
+      </p>
+    }
+  </main>
+  <app-footer />
+</div>

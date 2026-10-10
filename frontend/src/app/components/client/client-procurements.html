@@ -1,0 +1,89 @@
+<div class="app-shell">
+  <app-header-client />
+
+  <main class="page">
+    <h1>Public procurement</h1>
+    <p class="lead">
+      Confirming the cart publishes a call for offers instead of ordering directly.
+      Print shops have ten minutes to answer; the lowest offer that can be delivered wins.
+    </p>
+
+    @if (loaded && procurements.length === 0) {
+      <div class="card">
+        <p class="empty">No public procurement has been published yet.</p>
+      </div>
+    }
+
+    @for (procurement of procurements; track procurement.procurement_id) {
+      <div class="card">
+        <h2 class="card-title">Procurement {{ procurement.procurement_id }}</h2>
+        <p class="muted">
+          Published {{ procurement.opened_at.substring(0, 16).replace('T', ' ') }}
+          by {{ procurement.opened_by }}
+          &middot; {{ statusLabels[procurement.status] }}
+          @if (procurement.status === OPEN) {
+            &middot; {{ minutesLeft(procurement) }} minutes left
+          }
+        </p>
+
+        <h3>Requested products</h3>
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr><th>Product</th><th>Quantity</th></tr>
+            </thead>
+            <tbody>
+              @for (item of procurement.requested_items; track item.product_name) {
+                <tr>
+                  <td>{{ item.product_name }}</td>
+                  <td class="center">{{ item.quantity }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Offers</h3>
+        @if (procurement.bids.length === 0) {
+          <p class="empty">No print shop has sent an offer yet.</p>
+        } @else {
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Print shop</th>
+                  <th>Sent by</th>
+                  <th>Total offer</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (bid of sortedBids(procurement); track bid.institution_id) {
+                  <tr>
+                    <td>{{ bid.printer_name }}</td>
+                    <td class="center">{{ bid.submitted_by }}</td>
+                    <td class="center"><strong>{{ bid.total_amount }}</strong> RSD</td>
+                    <td class="center">
+                      @if (bid.institution_id === procurement.winner_institution_id) {
+                        <strong class="likes">Won</strong>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        @if (procurement.status === AWARDED) {
+          <div class="message message-success">
+            {{ procurement.winner_name }} won this procurement.
+            Invoice {{ procurement.invoice_id }} was created and is already in printing.
+          </div>
+        }
+      </div>
+    }
+  </main>
+
+  <app-footer />
+</div>

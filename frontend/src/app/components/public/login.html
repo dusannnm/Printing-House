@@ -1,0 +1,24 @@
+<div class="card card-narrow">
+  <h2 class="card-title">Sign in</h2>
+
+  <form (ngSubmit)="login()">
+    <div class="form-row">
+      <label for="username">Username</label>
+      <input id="username" type="text" name="username" [(ngModel)]="username" required />
+    </div>
+
+    <div class="form-row">
+      <label for="password">Password</label>
+      <input id="password" type="password" name="password" [(ngModel)]="password" required />
+    </div>
+
+    <div class="btn-row">
+      <button type="submit" class="btn">Log in</button>
+      <button type="button" class="btn btn-secondary" (click)="register()">Register</button>
+    </div>
+  </form>
+
+  @if (message) {
+    <div class="message message-error">{{ message }}</div>
+  }
+</div>

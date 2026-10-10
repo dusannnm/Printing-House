@@ -1,0 +1,183 @@
+<div class="app-shell">
+  <app-header-admin />
+
+  <main class="page">
+    <h1>User accounts</h1>
+    <p class="lead">
+      Every account in the system. Approving new registrations is done on the
+      Registration requests page.
+    </p>
+
+    @if (message) {
+      <div class="message" [class.message-error]="isError" [class.message-success]="!isError">
+        {{ message }}
+      </div>
+    }
+
+    <div class="card">
+      <div class="form-grid">
+        <div class="form-row">
+          <label for="searchText">Search</label>
+          <input id="searchText" type="text" name="searchText" [(ngModel)]="searchText"
+                 placeholder="Username, name, e-mail or institution" />
+        </div>
+
+        <div class="form-row">
+          <label for="filterType">Type of account</label>
+          <select id="filterType" name="filterType" [(ngModel)]="filterType">
+            <option value="">All types</option>
+            @for (type of registrableTypes; track type) {
+              <option [value]="type">{{ typeLabels[type] }}</option>
+            }
+          </select>
+        </div>
+      </div>
+      <p class="muted">{{ visibleUsers.length }} of {{ users.length }} accounts shown.</p>
+    </div>
+
+    @if (loaded && visibleUsers.length === 0) {
+      <div class="card"><p class="empty">No account matches this search.</p></div>
+    } @else {
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Username</th>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Institution</th>
+              <th>Contact</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of visibleUsers; track user.username) {
+              <tr>
+                <td class="center">
+                  <img class="avatar avatar-small"
+                       [src]="uploadsUrl + '/' + user.profile_image" [alt]="user.username" />
+                </td>
+                <td><strong>{{ user.username }}</strong></td>
+                <td>{{ user.name }} {{ user.surname }}</td>
+                <td class="center">{{ typeLabels[user.type] }}</td>
+                <td>
+                  @if (user.institution) {
+                    {{ user.institution.name }}
+                    <div class="muted">
+                      {{ user.institution.city }} &middot; {{ user.institution._id }}
+                    </div>
+                  } @else {
+                    <span class="muted">-</span>
+                  }
+                </td>
+                <td>
+                  {{ user.email }}
+                  <div class="muted">{{ user.phone }}</div>
+                </td>
+                <td class="center">
+                  {{ statusLabels[user.status] }}
+                  @if (user.status === PENDING) {
+                    <div><span class="badge badge-warning">waiting</span></div>
+                  }
+                </td>
+                <td class="center">
+                  <button type="button" class="btn btn-secondary" (click)="edit(user)">Edit</button>
+                  <button type="button" class="btn btn-danger" (click)="askDelete(user)">Delete</button>
+                </td>
+              </tr>
+
+              @if (confirmingDelete === user.username) {
+                <tr>
+                  <td colspan="8">
+                    <div class="message message-error">
+                      Delete <strong>{{ user.username }}</strong>? Invoices, products and
+                      comments belonging to this account stay in the system; only the
+                      account and its cart are removed.
+                      <div class="btn-row">
+                        <button type="button" class="btn btn-danger" (click)="confirmDelete(user)">
+                          Yes, delete it
+                        </button>
+                        <button type="button" class="btn btn-secondary" (click)="cancelDelete()">Cancel</button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              }
+
+              @if (editing === user.username) {
+                <tr>
+                  <td colspan="8">
+                    <h3>Editing {{ user.username }}</h3>
+
+                    <div class="form-grid">
+                      <div class="form-row">
+                        <label [attr.for]="'name_' + user.username">Name</label>
+                        <input [id]="'name_' + user.username" type="text" name="name"
+                               [(ngModel)]="edited.name" required />
+                      </div>
+
+                      <div class="form-row">
+                        <label [attr.for]="'surname_' + user.username">Surname</label>
+                        <input [id]="'surname_' + user.username" type="text" name="surname"
+                               [(ngModel)]="edited.surname" required />
+                      </div>
+
+                      <div class="form-row">
+                        <label [attr.for]="'phone_' + user.username">Contact telephone</label>
+                        <input [id]="'phone_' + user.username" type="text" name="phone"
+                               [(ngModel)]="edited.phone" required />
+                      </div>
+
+                      <div class="form-row">
+                        <label [attr.for]="'email_' + user.username">E-mail address</label>
+                        <input [id]="'email_' + user.username" type="text" name="email"
+                               [(ngModel)]="edited.email" required />
+                      </div>
+                    </div>
+
+                    @if (isInstitution(user)) {
+                      <p class="lead">
+                        The institution is shared with every colleague of this account, so a
+                        change here changes it for all of them. The registration number and
+                        the tax identification number identify it and cannot be changed.
+                      </p>
+
+                      <div class="form-grid">
+                        <div class="form-row">
+                          <label [attr.for]="'inst_' + user.username">Institution name</label>
+                          <input [id]="'inst_' + user.username" type="text" name="institution_name"
+                                 [(ngModel)]="edited.institution_name" required />
+                        </div>
+
+                        <div class="form-row">
+                          <label [attr.for]="'addr_' + user.username">Address</label>
+                          <input [id]="'addr_' + user.username" type="text" name="address"
+                                 [(ngModel)]="edited.address" required />
+                        </div>
+
+                        <div class="form-row">
+                          <label [attr.for]="'city_' + user.username">City</label>
+                          <input [id]="'city_' + user.username" type="text" name="city"
+                                 [(ngModel)]="edited.city" required />
+                        </div>
+                      </div>
+                    }
+
+                    <div class="btn-row">
+                      <button type="button" class="btn" (click)="save()">Save</button>
+                      <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Cancel</button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </main>
+
+  <app-footer />
+</div>

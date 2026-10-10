@@ -1,0 +1,112 @@
+<div class="app-shell">
+  <app-header-printer />
+
+  <main class="page">
+    <h1>Bidding</h1>
+    <p class="lead">
+      Public procurements published by legal entities. Each stays open for ten minutes,
+      and this print shop may send one offer covering every requested product. The
+      lowest offer that can actually be delivered wins the whole procurement.
+    </p>
+
+    @if (message) {
+      <div class="message" [class.message-error]="isError" [class.message-success]="!isError">
+        {{ message }}
+      </div>
+    }
+
+    @if (loaded && procurements.length === 0) {
+      <div class="card">
+        <p class="empty">No public procurement is open at the moment.</p>
+      </div>
+    }
+
+    @for (procurement of procurements; track procurement.procurement_id) {
+      <div class="card">
+        <h2 class="card-title">Procurement {{ procurement.procurement_id }}</h2>
+        <p class="muted">
+          {{ procurement.client_name }} &middot;
+          published {{ procurement.opened_at.substring(0, 16).replace('T', ' ') }} &middot;
+          <strong>{{ minutesLeft(procurement) }} minutes left</strong>
+        </p>
+
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Requested product</th>
+                <th>Quantity</th>
+                <th>Your product</th>
+                <th>Your stock</th>
+                <th>Your list price</th>
+                <th>Offered price per piece</th>
+                <th>Line total</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (line of procurement.offer_lines; track line.product_name) {
+                <tr>
+                  <td>{{ line.product_name }}</td>
+                  <td class="center">{{ line.quantity }}</td>
+                  <td class="center">
+                    @if (line.product_code) {
+                      {{ line.product_code }}
+                    } @else {
+                      <span class="badge badge-warning">not offered</span>
+                    }
+                  </td>
+                  <td class="center">
+                    {{ line.stock_quantity }}
+                    @if (line.product_code && !line.enough) {
+                      <div><span class="badge badge-warning">not enough</span></div>
+                    }
+                  </td>
+                  <td class="center">{{ line.unit_price }} RSD</td>
+                  <td class="center">
+                    @if (procurement.already_bid || !procurement.can_supply) {
+                      <span class="muted">-</span>
+                    } @else {
+                      <input type="number" class="quantity-input" min="1"
+                             [name]="'price_' + procurement.procurement_id + '_' + line.product_name"
+                             [(ngModel)]="prices[procurement.procurement_id][line.product_name]" />
+                    }
+                  </td>
+                  <td class="center">
+                    @if (!procurement.already_bid && procurement.can_supply) {
+                      <strong>{{ (prices[procurement.procurement_id][line.product_name] || 0) * line.quantity }}</strong> RSD
+                    } @else {
+                      <span class="muted">-</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (procurement.already_bid) {
+          <div class="message message-success">
+            This print shop has already sent an offer for this procurement. Only one
+            offer per call is allowed, and the result appears once the ten minutes pass.
+          </div>
+        } @else if (!procurement.can_supply) {
+          <div class="message message-error">
+            This print shop cannot answer this call: it does not offer every requested
+            product in the needed quantity. Add the missing products or raise the stock.
+          </div>
+        } @else {
+          <div class="card stat-card">
+            <span>Your total offer</span>
+            <span class="stat-number">{{ offerTotal(procurement) }} RSD</span>
+          </div>
+
+          <div class="btn-row">
+            <button type="button" class="btn" (click)="send(procurement)">SEND OFFER</button>
+          </div>
+        }
+      </div>
+    }
+  </main>
+
+  <app-footer />
+</div>

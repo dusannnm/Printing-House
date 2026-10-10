@@ -1,0 +1,135 @@
+<div class="app-shell">
+  <app-header-client />
+
+  <main class="page">
+    @if (isLegalEntity) {
+      <h1>Cart</h1>
+      <p class="lead">
+        Confirming publishes a public procurement. Print shops then have ten minutes to
+        send their offers, and the lowest offer that can be delivered wins.
+      </p>
+    } @else {
+      <h1>Cart</h1>
+      <p class="lead">
+        Products are grouped by print shop. Confirming creates one invoice for each of them.
+      </p>
+    }
+
+    @if (message) {
+      <div class="message" [class.message-error]="isError" [class.message-success]="!isError">
+        {{ message }}
+      </div>
+    }
+
+    @if (loaded && itemCount === 0) {
+      <div class="card">
+        <p class="empty">The cart is empty.</p>
+        <div class="btn-row">
+          <button type="button" class="btn" (click)="keepShopping()">Search products</button>
+        </div>
+      </div>
+    }
+
+    @if (isLegalEntity && requestedItems.length > 0) {
+      <div class="card">
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Requested product</th>
+                <th>Quantity</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of requestedItems; track item.product_name; let i = $index) {
+                <tr>
+                  <td>{{ item.product_name }}</td>
+                  <td class="center">{{ item.quantity }}</td>
+                  <td class="center">
+                    <button type="button" class="btn btn-danger" (click)="remove(i)">Remove</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card stat-card">
+        <span class="stat-number">{{ requestedItems.length }}</span>
+        <span>{{ requestedItems.length === 1 ? 'product' : 'different products' }} in the cart</span>
+      </div>
+    }
+
+    @for (group of groups; track group.institution_id) {
+      <div class="card">
+        <h2 class="card-title">{{ group.printer_name }}</h2>
+        <p class="muted">{{ group.printer_city }}</p>
+
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Colour</th>
+                <th>Type of print</th>
+                <th>Text</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of group.items; track item.index) {
+                <tr>
+                  <td>{{ item.product_name }}</td>
+                  <td class="center">{{ item.color }}</td>
+                  <td>
+                    {{ item.print_type || '-' }}
+                    @if (item.extra_price_per_piece) {
+                      <div class="muted">+{{ item.extra_price_per_piece }} RSD per piece</div>
+                    }
+                  </td>
+                  <td>{{ item.print_text || '-' }}</td>
+                  <td class="center">{{ item.quantity }}</td>
+                  <td class="center"><strong>{{ item.line_total }}</strong> RSD</td>
+                  <td>
+                    <button type="button" class="btn btn-danger" (click)="remove(item.index)">Remove</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+            <tfoot>
+              <tr>
+                <th colspan="5">Invoice total for {{ group.printer_name }}</th>
+                <th colspan="2">{{ group.group_total }} RSD</th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    }
+
+    @if (!isLegalEntity && groups.length > 0) {
+      <div class="card stat-card">
+        <span>
+          {{ itemCount }} {{ itemCount === 1 ? 'line' : 'lines' }} from
+          {{ groups.length }} {{ groups.length === 1 ? 'print shop' : 'print shops' }}
+        </span>
+        <span class="stat-number">{{ total }} RSD</span>
+      </div>
+    }
+
+    @if (itemCount > 0) {
+      <div class="btn-row">
+        <button type="button" class="btn" (click)="confirm()">
+          {{ isLegalEntity ? 'CONFIRM AND PUBLISH' : 'CONFIRM' }}
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="keepShopping()">Continue shopping</button>
+      </div>
+    }
+  </main>
+
+  <app-footer />
+</div>

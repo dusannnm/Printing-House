@@ -1,0 +1,19 @@
+<div class="app-shell">
+  <app-header-admin />
+
+  <main class="page">
+    <h1>Administration</h1>
+    <p class="lead">Signed in as {{ user?.username }}.</p>
+
+    <div class="card">
+      <div class="btn-row">
+        <a class="btn" routerLink="/admin/users">User accounts</a>
+        <a class="btn" routerLink="/admin/requests">Registration requests</a>
+        <a class="btn" routerLink="/admin/categories">Product categories</a>
+        <a class="btn" routerLink="/admin/statistics">Statistics</a>
+      </div>
+    </div>
+  </main>
+
+  <app-footer />
+</div>

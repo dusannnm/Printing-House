@@ -1,0 +1,119 @@
+<div class="app-shell">
+  <app-header-client />
+
+  <main class="page">
+    @if (message) {
+      <div class="message message-error">{{ message }}</div>
+      <div class="btn-row">
+        <button type="button" class="btn btn-secondary" (click)="back()">Back to search</button>
+      </div>
+    }
+
+    @if (product) {
+      <h1>{{ product.name }}</h1>
+      <p class="lead">{{ product.category }}<!--
+        -->@if (product.subcategory) { <span> &middot; {{ product.subcategory }}</span> }</p>
+
+      <div class="details-layout">
+        <img class="product-image" [src]="uploadsUrl + '/' + product.main_image" [alt]="product.name" />
+
+        <div class="card">
+          <p>{{ product.description }}</p>
+
+          <div class="table-scroll">
+          <table class="data-table">
+            <tbody>
+              <tr>
+                <th>Print shop</th>
+                <td>
+                  {{ product.printer_name }}
+                  <div class="muted">{{ product.printer_address }}, {{ product.printer_city }}</div>
+                </td>
+              </tr>
+              <tr>
+                <th>Price per piece</th>
+                <td><strong>{{ product.unit_price }} RSD</strong></td>
+              </tr>
+              <tr>
+                <th>On stock</th>
+                <td>{{ product.stock_quantity }}</td>
+              </tr>
+              <tr>
+                <th>Likes</th>
+                <td class="likes">{{ product.likes }}</td>
+              </tr>
+              <tr>
+                <th>Dislikes</th>
+                <td class="dislikes">{{ product.dislikes }}</td>
+              </tr>
+            </tbody>
+          </table>
+          </div>
+
+          <div class="form-row">
+            <label for="color">Colour</label>
+            <select id="color" name="color" [(ngModel)]="selectedColor">
+              @for (color of colorOptions; track color) {
+                <option [value]="color">{{ color }}</option>
+              }
+            </select>
+            @if (product.colors.length === 0) {
+              <span class="hint">This product is only offered in white.</span>
+            }
+          </div>
+
+          <div class="btn-row">
+            <button type="button" class="btn" (click)="next()">NEXT</button>
+            <button type="button" class="btn btn-secondary" (click)="back()">Back</button>
+          </div>
+        </div>
+      </div>
+
+      <h2>Latest comments</h2>
+      @if (product.comments.length === 0) {
+        <div class="card"><p class="empty">No client has commented on this product yet.</p></div>
+      } @else {
+        <p class="lead">The five newest comments. Your own are framed in orange.</p>
+
+        @for (comment of product.comments; track comment.date) {
+          <div class="comment" [class.own-comment]="comment.username === username">
+            <div class="meta">
+              {{ comment.username }} &middot; {{ comment.date.substring(0, 10) }}
+            </div>
+            {{ comment.text }}
+          </div>
+        }
+      }
+
+      <h2>Types of print</h2>
+      <p class="lead">Each type adds to the price of a single piece.</p>
+
+      @if (product.print_services.length === 0) {
+        <div class="card"><p class="empty">This print shop offers no print for this product yet.</p></div>
+      } @else {
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Type of print</th>
+                <th>Maximum size</th>
+                <th>Extra price per piece</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (service of product.print_services; track service.service_id) {
+                <tr>
+                  <td>{{ service.print_type }}</td>
+                  <td class="center">{{ service.max_width_mm }} x {{ service.max_height_mm }} mm</td>
+                  <td class="center">{{ service.extra_price_per_piece }} RSD</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  </main>
+
+  <app-footer />
+</div>

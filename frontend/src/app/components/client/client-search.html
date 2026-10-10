@@ -1,0 +1,85 @@
+<div class="app-shell">
+  <app-header-client />
+
+  <main class="page">
+    <h1>Search products</h1>
+    <p class="lead">Only products the print shops currently have on stock are offered.</p>
+
+    <div class="card">
+      <form (ngSubmit)="search()">
+        <div class="form-grid">
+          <div class="form-row">
+            <label for="searchName">Product name</label>
+            <input id="searchName" type="text" name="searchName" [(ngModel)]="searchName"
+                   placeholder="Part of the name is enough" />
+          </div>
+
+          <div class="form-row">
+            <label for="searchCategory">Category</label>
+            <select id="searchCategory" name="searchCategory" [(ngModel)]="searchCategory">
+              <option value="">All categories</option>
+              @for (category of categories; track category) {
+                <option [value]="category">{{ category }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="searchCity">City</label>
+            <select id="searchCity" name="searchCity" [(ngModel)]="searchCity">
+              <option value="">All cities</option>
+              @for (city of cities; track city) {
+                <option [value]="city">{{ city }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button type="submit" class="btn">Search</button>
+          <button type="button" class="btn btn-secondary" (click)="resetSearch()">Reset</button>
+        </div>
+      </form>
+    </div>
+
+    @if (searched) {
+      @if (results.length === 0) {
+        <div class="card"><p class="empty">No products match this search.</p></div>
+      } @else {
+        <p class="lead">{{ results.length }} {{ results.length === 1 ? 'product' : 'products' }} found.</p>
+
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="sortable" (click)="sortByName()" title="Click to sort alphabetically">
+                  Product {{ sortAscending ? '&#9650;' : '&#9660;' }}
+                </th>
+                <th>Category</th>
+                <th>Print shop</th>
+                <th>City</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (product of results; track product.code) {
+                <tr>
+                  <td>{{ product.name }}</td>
+                  <td>{{ product.category }}</td>
+                  <td>{{ product.printer_name }}</td>
+                  <td class="center">{{ product.printer_city }}</td>
+                  <td>
+                    <button type="button" class="btn btn-secondary"
+                            (click)="openDetails(product.code)">DETAILS</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  </main>
+
+  <app-footer />
+</div>

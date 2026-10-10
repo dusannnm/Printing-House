@@ -1,0 +1,92 @@
+<div class="app-shell">
+  <app-header-client />
+
+  <main class="page">
+    <h1>Search products</h1>
+    <p class="lead">
+      Products are listed by name. A public procurement goes out to every print shop,
+      so you ask for what you need and the shops answer with their own offers.
+    </p>
+
+    <div class="card">
+      <form (ngSubmit)="search()">
+        <div class="form-grid">
+          <div class="form-row">
+            <label for="searchName">Product name</label>
+            <input id="searchName" type="text" name="searchName" [(ngModel)]="searchName"
+                   placeholder="Part of the name is enough" />
+          </div>
+
+          <div class="form-row">
+            <label for="searchCategory">Category</label>
+            <select id="searchCategory" name="searchCategory" [(ngModel)]="searchCategory">
+              <option value="">All categories</option>
+              @for (category of categories; track category) {
+                <option [value]="category">{{ category }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button type="submit" class="btn">Search</button>
+          <button type="button" class="btn btn-secondary" (click)="resetSearch()">Reset</button>
+        </div>
+      </form>
+    </div>
+
+    @if (message) {
+      <div class="message" [class.message-error]="isError" [class.message-success]="!isError">
+        {{ message }}
+        @if (!isError) {
+          <button type="button" class="btn btn-link" (click)="openCart()">Open the request</button>
+        }
+      </div>
+    }
+
+    @if (searched) {
+      @if (results.length === 0) {
+        <div class="card"><p class="empty">No products match this search.</p></div>
+      } @else {
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="sortable" (click)="sortByName()" title="Click to sort alphabetically">
+                  Product {{ sortAscending ? '&#9650;' : '&#9660;' }}
+                </th>
+                <th>Category</th>
+                <th>Offered by</th>
+                <th>Most from one shop</th>
+                <th>Quantity</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (product of results; track product.product_name) {
+                <tr>
+                  <td>{{ product.product_name }}</td>
+                  <td>{{ product.category }}</td>
+                  <td class="center">{{ product.shops }} {{ product.shops === 1 ? 'print shop' : 'print shops' }}</td>
+                  <td class="center">{{ product.best_stock }}</td>
+                  <td class="center">
+                    <input type="number" class="quantity-input" min="1" [max]="product.best_stock"
+                           [name]="'quantity_' + product.product_name"
+                           [(ngModel)]="quantities[product.product_name]" />
+                  </td>
+                  <td>
+                    <button type="button" class="btn" (click)="addToRequest(product)">ADD</button>
+                    <button type="button" class="btn btn-secondary"
+                            (click)="openDetails(product.product_name)">DETAILS</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  </main>
+
+  <app-footer />
+</div>

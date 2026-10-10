@@ -1,0 +1,135 @@
+<div class="app-shell">
+  <app-header-client />
+
+  <main class="page">
+    <h1>{{ productName }}</h1>
+
+    @if (offers.length > 0) {
+      <p class="lead">
+        {{ offers[0].category }}
+        @if (offers[0].subcategory) { <span>&middot; {{ offers[0].subcategory }}</span> }
+        &middot; offered by {{ offers.length }}
+        {{ offers.length === 1 ? 'print shop' : 'print shops' }}
+      </p>
+
+      <div class="card">
+        <div class="profile-layout">
+          <img class="avatar" [src]="uploadsUrl + '/' + offers[0].main_image" [alt]="productName" />
+
+          <div>
+            <p>
+              Asking for this product publishes a call to <strong>all</strong> print shops.
+              The prices below are what each shop charges today - the price you pay is
+              whatever they offer during the ten minutes of bidding, and the lowest offer
+              that can be delivered wins.
+            </p>
+
+            <div class="form-row">
+              <label for="quantity">Quantity</label>
+              <input id="quantity" type="number" name="quantity" [(ngModel)]="quantity"
+                     min="1" [max]="bestStock" class="quantity-input" />
+              <span class="hint">
+                At most {{ bestStock }} - one print shop has to deliver the whole procurement.
+              </span>
+            </div>
+
+            <div class="btn-row">
+              <button type="button" class="btn" (click)="addToRequest()">ADD TO CART</button>
+              <button type="button" class="btn btn-secondary" (click)="back()">BACK</button>
+            </div>
+          </div>
+        </div>
+
+        @if (message) {
+          <div class="message" [class.message-error]="isError" [class.message-success]="!isError">
+            {{ message }}
+            @if (!isError) {
+              <button type="button" class="btn btn-link" (click)="openCart()">Open the cart</button>
+            }
+          </div>
+        }
+      </div>
+
+      <h2>Print shops offering it</h2>
+
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Print shop</th>
+              <th>City</th>
+              <th>Price per piece</th>
+              <th>On stock</th>
+              <th>Types of print</th>
+              <th>Colours</th>
+              <th>Liked</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (offer of offers; track offer.code) {
+              <tr>
+                <td>
+                  <strong>{{ offer.printer_name }}</strong>
+                  @if (offer.unit_price === cheapest) {
+                    <div><span class="badge">cheapest today</span></div>
+                  }
+                </td>
+                <td class="center">{{ offer.printer_city }}</td>
+                <td class="center"><strong>{{ offer.unit_price }}</strong> RSD</td>
+                <td class="center">{{ offer.stock_quantity }}</td>
+                <td>
+                  @if (offer.print_services.length === 0) {
+                    <span class="muted">-</span>
+                  } @else {
+                    @for (service of offer.print_services; track service.service_id) {
+                      <div>
+                        {{ service.print_type }}
+                        <span class="muted">(+{{ service.extra_price_per_piece }} RSD)</span>
+                      </div>
+                    }
+                  }
+                </td>
+                <td>{{ offer.colors.length > 0 ? offer.colors.join(', ') : 'White' }}</td>
+                <td class="center">
+                  <span class="likes">{{ offer.likes }}</span> /
+                  <span class="dislikes">{{ offer.dislikes }}</span>
+                </td>
+                <td><p>{{ offer.description }}</p></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <h2>What clients said</h2>
+      @if (allComments.length === 0) {
+        <div class="card">
+          <p class="empty">No client has commented on this product yet.</p>
+        </div>
+      } @else {
+        <p class="lead">
+          The newest comments left for this product at each print shop. Your own are
+          framed in orange.
+        </p>
+
+        @for (entry of allComments; track entry.shop + entry.comment.date) {
+          <div class="comment" [class.own-comment]="entry.comment.username === username">
+            <div class="meta">
+              {{ entry.comment.username }} &middot;
+              {{ entry.comment.date.substring(0, 10) }} &middot;
+              about the one from <strong>{{ entry.shop }}</strong>
+            </div>
+            {{ entry.comment.text }}
+          </div>
+        }
+      }
+    } @else if (message) {
+      <div class="message message-error">{{ message }}</div>
+      <div class="btn-row">
+        <button type="button" class="btn btn-secondary" (click)="back()">Back to search</button>
+      </div>
+    }
+  </main>
+
+  <app-footer />
+</div>

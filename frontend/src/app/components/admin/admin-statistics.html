@@ -1,0 +1,94 @@
+<div class="app-shell">
+  <app-header-admin />
+
+  <main class="page">
+    <h1>Statistics</h1>
+    <p class="lead">Cancelled invoices are left out of all three charts.</p>
+
+    <h2>Turnover per print shop</h2>
+    <p class="lead">
+      What each print shop sold to clients over the last three months, largest first.
+      @if (revenueFrom) { <span>Counted from {{ revenueFrom.substring(0, 10) }}.</span> }
+    </p>
+
+    <div class="card">
+      <div class="chart-box">
+        <canvas #revenueCanvas></canvas>
+      </div>
+
+      @if (revenueRows.length === 0) {
+        <p class="empty">Nothing was ordered in the last three months.</p>
+      } @else {
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Print shop</th>
+                <th>City</th>
+                <th>Invoices</th>
+                <th>Turnover</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of revenueRows; track row.institution_id) {
+                <tr>
+                  <td>{{ row.printer_name }}</td>
+                  <td class="center">{{ row.printer_city }}</td>
+                  <td class="center">{{ row.invoices }}</td>
+                  <td class="center"><strong>{{ row.total }}</strong> RSD</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    <h2>Most ordered products</h2>
+    <p class="lead">
+      Which products clients ordered most over the last month, by number of pieces.
+      @if (productsTotal) {
+        <span>{{ productsTotal }} pieces ordered in total since {{ productsFrom.substring(0, 10) }}.</span>
+      }
+    </p>
+
+    <div class="card">
+      <div class="chart-box chart-box-square">
+        <canvas #productsCanvas></canvas>
+      </div>
+
+      @if (productRows.length === 0) {
+        <p class="empty">Nothing was ordered in the last month.</p>
+      }
+    </div>
+
+    <h2>Rating over time</h2>
+    <p class="lead">
+      The running score of each product: a like counts as +1 and a dislike as -1.
+      Switch products off to compare only the ones you are interested in.
+    </p>
+
+    <div class="card">
+      @if (loaded && ratingSeries.length === 0) {
+        <p class="empty">No product has been rated yet.</p>
+      } @else {
+        <div class="chart-box">
+          <canvas #ratingsCanvas></canvas>
+        </div>
+
+        <div class="legend">
+          @for (series of ratingSeries; track series.code; let i = $index) {
+            <label class="legend-item">
+              <input type="checkbox" [checked]="!isHidden(series.code)" (change)="toggle(series.code)" />
+              <span class="legend-swatch" [style.background]="colors[i % colors.length]"></span>
+              {{ series.name }}
+              <span class="muted">({{ series.code }})</span>
+            </label>
+          }
+        </div>
+      }
+    </div>
+  </main>
+
+  <app-footer />
+</div>

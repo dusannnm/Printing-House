@@ -1,0 +1,78 @@
+<div class="app-shell">
+  <app-header-printer />
+
+  <main class="page">
+    <h1>Stock</h1>
+    <p class="lead">
+      Change how many pieces of each product the print shop has. A product with zero
+      on stock stays in the catalogue but disappears from the clients' search.
+    </p>
+
+    @if (message) {
+      <div class="message" [class.message-error]="isError" [class.message-success]="!isError">
+        {{ message }}
+      </div>
+    }
+
+    @if (loaded && products.length === 0) {
+      <div class="card">
+        <p class="empty">This print shop has no products yet.</p>
+        <div class="btn-row">
+          <a class="btn" routerLink="/printer/products">Add a product</a>
+        </div>
+      </div>
+    } @else {
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Code</th>
+              <th>Category</th>
+              <th>Price per piece</th>
+              <th>On stock</th>
+              <th>New quantity</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (product of products; track product.code) {
+              <tr>
+                <td><strong>{{ product.name }}</strong></td>
+                <td class="center">{{ product.code }}</td>
+                <td>
+                  {{ product.category }}
+                  @if (product.subcategory) {
+                    <div class="muted">{{ product.subcategory }}</div>
+                  }
+                </td>
+                <td class="center"><strong>{{ product.unit_price }}</strong> RSD</td>
+                <td class="center">
+                  {{ product.stock_quantity }}
+                  @if (product.stock_quantity === 0) {
+                    <div><span class="badge badge-warning">out of stock</span></div>
+                  }
+                </td>
+                <td class="center">
+                  <input type="number" class="quantity-input" min="0" step="1"
+                         [name]="'stock_' + product.code"
+                         [(ngModel)]="quantities[product.code]" />
+                </td>
+                <td class="center">
+                  @if (isChanged(product)) {
+                    <button type="button" class="btn" (click)="save(product)">Save</button>
+                    <button type="button" class="btn btn-secondary" (click)="undo(product)">Undo</button>
+                  } @else {
+                    <span class="muted">unchanged</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </main>
+
+  <app-footer />
+</div>

@@ -1,0 +1,117 @@
+<div class="app-shell">
+  <app-header-admin />
+
+  <main class="page">
+    <h1>Product categories</h1>
+    <p class="lead">
+      Print shops choose from these when they add a product, so a category that still
+      holds products cannot be deleted. Renaming one moves its products with it.
+    </p>
+
+    @if (message) {
+      <div class="message" [class.message-error]="isError" [class.message-success]="!isError">
+        {{ message }}
+      </div>
+    }
+
+    <div class="card">
+      <form (ngSubmit)="add()">
+        <div class="form-row">
+          <label for="newCategory">New category</label>
+          <input id="newCategory" type="text" name="newCategory" [(ngModel)]="newCategory" maxlength="100"
+                 placeholder="for example Packaging print" required />
+        </div>
+        <div class="btn-row">
+          <button type="submit" class="btn">Add category</button>
+        </div>
+      </form>
+    </div>
+
+    @if (loaded && categories.length === 0) {
+      <div class="card"><p class="empty">There are no categories yet.</p></div>
+    }
+
+    @for (category of categories; track category.name) {
+      <div class="card">
+        @if (renamingCategory === category.name) {
+          <div class="form-row">
+            <label [attr.for]="'rename_' + category.name">New name for "{{ category.name }}"</label>
+            <input [id]="'rename_' + category.name" type="text" name="renameText"
+                   [(ngModel)]="renameText" />
+          </div>
+          <div class="btn-row">
+            <button type="button" class="btn" (click)="saveRenameCategory(category)">Save</button>
+            <button type="button" class="btn btn-secondary" (click)="cancelRename()">Cancel</button>
+          </div>
+        } @else {
+          <h2 class="card-title">{{ category.name }}</h2>
+          <p class="muted">
+            {{ category.subcategories.length }}
+            {{ category.subcategories.length === 1 ? 'subcategory' : 'subcategories' }}
+          </p>
+
+          <div class="btn-row">
+            <button type="button" class="btn btn-secondary" (click)="toggle(category)">
+              {{ openCategory === category.name ? 'Hide subcategories' : 'Subcategories' }}
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="startRenameCategory(category)">Rename</button>
+            <button type="button" class="btn btn-danger" (click)="remove(category)">Delete</button>
+          </div>
+        }
+
+        @if (openCategory === category.name) {
+          @if (category.subcategories.length === 0) {
+            <p class="empty">This category has no subcategories yet.</p>
+          } @else {
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Subcategory</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (subcategory of category.subcategories; track subcategory.name) {
+                    <tr>
+                      <td>
+                        @if (renamingSubcategory === subcategory.name) {
+                          <input type="text" name="renameText" [(ngModel)]="renameText" />
+                        } @else {
+                          {{ subcategory.name }}
+                        }
+                      </td>
+                      <td class="center">
+                        @if (renamingSubcategory === subcategory.name) {
+                          <button type="button" class="btn"
+                                  (click)="saveRenameSubcategory(category, subcategory.name)">Save</button>
+                          <button type="button" class="btn btn-secondary" (click)="cancelRename()">Cancel</button>
+                        } @else {
+                          <button type="button" class="btn btn-secondary"
+                                  (click)="startRenameSubcategory(subcategory.name)">Rename</button>
+                          <button type="button" class="btn btn-danger"
+                                  (click)="removeSubcategory(category, subcategory.name)">Delete</button>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+
+          <div class="form-row">
+            <label [attr.for]="'newSub_' + category.name">New subcategory in "{{ category.name }}"</label>
+            <input [id]="'newSub_' + category.name" type="text" name="newSubcategory"
+                   [(ngModel)]="newSubcategory" />
+          </div>
+          <div class="btn-row">
+            <button type="button" class="btn" (click)="addSubcategory(category)">Add subcategory</button>
+          </div>
+        }
+      </div>
+    }
+  </main>
+
+  <app-footer />
+</div>

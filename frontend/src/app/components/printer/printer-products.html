@@ -1,0 +1,196 @@
+<div class="app-shell">
+  <app-header-printer />
+
+  <main class="page">
+    <h1>Products and services</h1>
+    <p class="lead">
+      Products are added into the predefined categories. Once a product exists, the
+      types of print it can be ordered with are defined underneath it.
+    </p>
+
+    @if (message) {
+      <div class="message" [class.message-error]="isError" [class.message-success]="!isError">
+        {{ message }}
+      </div>
+    }
+
+    <h2>Add a product</h2>
+    <div class="card">
+      <form (ngSubmit)="addProduct()">
+        <div class="form-grid">
+          <div class="form-row">
+            <label for="code">Code</label>
+            <input id="code" type="text" name="code" [(ngModel)]="newProduct.code" maxlength="20" required />
+            <span class="hint">Unique across the whole system, for example CS-005.</span>
+          </div>
+
+          <div class="form-row">
+            <label for="name">Product name</label>
+            <input id="name" type="text" name="name" [(ngModel)]="newProduct.name" maxlength="100" required />
+            <span class="hint">Clients search by this name, so keep it recognisable.</span>
+          </div>
+
+          <div class="form-row">
+            <label for="category">Category</label>
+            <select id="category" name="category" [(ngModel)]="newProduct.category"
+                    (ngModelChange)="onCategoryChanged()" required>
+              <option value="">Choose...</option>
+              @for (category of categories; track category.name) {
+                <option [value]="category.name">{{ category.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="subcategory">Subcategory</label>
+            <select id="subcategory" name="subcategory" [(ngModel)]="newProduct.subcategory"
+                    [disabled]="subcategories.length === 0">
+              <option value="">None</option>
+              @for (subcategory of subcategories; track subcategory.name) {
+                <option [value]="subcategory.name">{{ subcategory.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="unit_price">Unit price (RSD)</label>
+            <input id="unit_price" type="number" name="unit_price" min="1"
+                   [(ngModel)]="newProduct.unit_price" required />
+          </div>
+
+          <div class="form-row">
+            <label for="stock_quantity">Quantity on stock</label>
+            <input id="stock_quantity" type="number" name="stock_quantity" min="0"
+                   [(ngModel)]="newProduct.stock_quantity" required />
+            <span class="hint">A product with zero on stock does not appear in the search.</span>
+          </div>
+
+          <div class="form-row">
+            <label for="colors">Colours</label>
+            <input id="colors" type="text" name="colors" [(ngModel)]="colors"
+                   placeholder="White, Black, Navy blue" />
+            <span class="hint">Separated by commas. Left empty means white only.</span>
+          </div>
+
+          <div class="form-row">
+            <label for="image">Picture</label>
+            <input id="image" type="file" name="image"
+                   accept="image/jpeg,image/png,image/gif" (change)="onFileSelected($event)" />
+            <span class="hint">JPG, PNG or GIF, up to 2 MB. Optional.</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label for="description">Description</label>
+          <textarea id="description" name="description" rows="3" maxlength="1000"
+                    [(ngModel)]="newProduct.description"></textarea>
+        </div>
+
+        <div class="btn-row">
+          <button type="submit" class="btn">Add product</button>
+        </div>
+      </form>
+    </div>
+
+    <h2>Catalogue</h2>
+
+    @if (loaded && products.length === 0) {
+      <div class="card"><p class="empty">This print shop offers no products yet.</p></div>
+    }
+
+    @for (product of products; track product.code) {
+      <div class="card">
+        <div class="profile-layout">
+          <img class="avatar" [src]="uploadsUrl + '/' + product.main_image" [alt]="product.name" />
+
+          <div>
+            <h2 class="card-title">{{ product.name }}</h2>
+            <p class="muted">
+              {{ product.code }} &middot; {{ product.category }}
+              @if (product.subcategory) { <span>&middot; {{ product.subcategory }}</span> }
+              &middot; added by {{ product.added_by }}
+            </p>
+            <p>{{ product.description }}</p>
+            <p>
+              <strong>{{ product.unit_price }} RSD</strong> per piece &middot;
+              {{ product.stock_quantity }} on stock &middot;
+              {{ product.colors.length > 0 ? product.colors.join(', ') : 'White' }}
+            </p>
+
+            <div class="btn-row">
+              <button type="button" class="btn btn-secondary" (click)="openServices(product)">
+                Types of print ({{ product.print_services.length }})
+              </button>
+            </div>
+          </div>
+        </div>
+
+        @if (servicesFor === product.code) {
+          @if (product.print_services.length === 0) {
+            <p class="empty">No type of print is offered for this product yet.</p>
+          } @else {
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Type of print</th>
+                    <th>Maximum size</th>
+                    <th>Extra price per piece</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (service of product.print_services; track service.service_id) {
+                    <tr>
+                      <td>{{ service.print_type }}</td>
+                      <td class="center">{{ service.max_width_mm }} x {{ service.max_height_mm }} mm</td>
+                      <td class="center">{{ service.extra_price_per_piece }} RSD</td>
+                      <td>
+                        <button type="button" class="btn btn-danger"
+                                (click)="removeService(product, service.service_id)">Remove</button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+
+          <h3>Add a type of print</h3>
+          <div class="form-grid">
+            <div class="form-row">
+              <label [attr.for]="'print_type_' + product.code">Type of print</label>
+              <input [id]="'print_type_' + product.code" type="text" name="print_type"
+                     [(ngModel)]="newService.print_type"
+                     placeholder="Direct to garment print (DTG)" />
+            </div>
+
+            <div class="form-row">
+              <label [attr.for]="'extra_' + product.code">Extra price per piece (RSD)</label>
+              <input [id]="'extra_' + product.code" type="number" name="extra_price_per_piece" min="0"
+                     [(ngModel)]="newService.extra_price_per_piece" />
+            </div>
+
+            <div class="form-row">
+              <label [attr.for]="'width_' + product.code">Maximum width (mm)</label>
+              <input [id]="'width_' + product.code" type="number" name="max_width_mm" min="1"
+                     [(ngModel)]="newService.max_width_mm" />
+            </div>
+
+            <div class="form-row">
+              <label [attr.for]="'height_' + product.code">Maximum height (mm)</label>
+              <input [id]="'height_' + product.code" type="number" name="max_height_mm" min="1"
+                     [(ngModel)]="newService.max_height_mm" />
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button type="button" class="btn" (click)="addService(product)">Add type of print</button>
+          </div>
+        }
+      </div>
+    }
+  </main>
+
+  <app-footer />
+</div>

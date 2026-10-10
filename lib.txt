@@ -1,0 +1,143 @@
+================================================================================
+LIBRARIES USED IN THE PROJECT - "Printing House" (PIA 2025/2026)
+================================================================================
+All npm packages install automatically with "npm install" inside the matching
+folder (backend/ and frontend/), because they are listed in package.json.
+The links below point to the official download / package page of each library.
+
+
+--------------------------------------------------------------------------------
+0. PLATFORM / TOOLS (installed manually, once)
+--------------------------------------------------------------------------------
+Node.js                  v22.21.0    https://nodejs.org/en/download
+  JavaScript runtime the backend runs on; also provides npm.
+
+npm                      (bundled with Node.js)
+  Package manager used to install every library below.
+
+MongoDB Community Server  v7+        https://www.mongodb.com/try/download/community
+  Database. Connection used by the app: mongodb://127.0.0.1:27017/printingHouse2026
+
+MongoDB Compass (optional)           https://www.mongodb.com/try/download/compass
+  GUI for inspecting the collections.
+
+Angular CLI (global, optional)       https://www.npmjs.com/package/@angular/cli
+  Install with: npm install -g @angular/cli
+  Only needed if you want the "ng" command outside of npm scripts.
+
+
+--------------------------------------------------------------------------------
+1. BACKEND - runtime dependencies (backend/package.json)
+--------------------------------------------------------------------------------
+express          ^5.2.1    https://www.npmjs.com/package/express
+  Web server and routing (routers + controllers).
+
+mongoose         ^9.7.1    https://www.npmjs.com/package/mongoose
+  ODM for MongoDB - schemas, models and queries.
+
+mongodb          ^7.3.0    https://www.npmjs.com/package/mongodb
+  Official MongoDB driver. Used directly by the seed script (db/seed.js),
+  and internally by Mongoose.
+
+cors             ^2.8.6    https://www.npmjs.com/package/cors
+  Enables requests from the Angular app (localhost:4200) to the API.
+
+multer           ^2.3.0    https://www.npmjs.com/package/multer
+  Multipart/form-data handling - upload of profile pictures and product images.
+
+bcryptjs         ^3.0.3    https://www.npmjs.com/package/bcryptjs
+  Password hashing; passwords are never stored in plain text.
+
+@types/multer    ^2.2.0    https://www.npmjs.com/package/@types/multer
+  TypeScript type definitions for multer.
+
+
+--------------------------------------------------------------------------------
+2. BACKEND - development dependencies (backend/package.json)
+--------------------------------------------------------------------------------
+typescript       ^6.0.3    https://www.npmjs.com/package/typescript
+  Compiles src/*.ts into dist/*.js ("npm run build").
+
+@types/node      ^25.9.4   https://www.npmjs.com/package/@types/node
+@types/express   ^5.0.6    https://www.npmjs.com/package/@types/express
+@types/cors      ^2.8.19   https://www.npmjs.com/package/@types/cors
+  TypeScript type definitions for Node.js, Express and cors.
+
+
+--------------------------------------------------------------------------------
+3. FRONTEND - runtime dependencies (frontend/package.json)
+--------------------------------------------------------------------------------
+@angular/core              ^20.3.0   https://www.npmjs.com/package/@angular/core
+  Angular framework core (standalone components, dependency injection).
+
+@angular/common            ^20.3.0   https://www.npmjs.com/package/@angular/common
+  Common directives/pipes and HttpClient used by all services.
+
+@angular/compiler          ^20.3.0   https://www.npmjs.com/package/@angular/compiler
+  Compiles Angular templates.
+
+@angular/forms             ^20.3.0   https://www.npmjs.com/package/@angular/forms
+  Template-driven forms (FormsModule, [(ngModel)]).
+
+@angular/platform-browser  ^20.3.0   https://www.npmjs.com/package/@angular/platform-browser
+  Bootstraps the application in the browser.
+
+@angular/router            ^20.3.0   https://www.npmjs.com/package/@angular/router
+  Routing and route guards.
+
+chart.js                   ^4.5.1    https://www.npmjs.com/package/chart.js
+  Charts on the administrator statistics page.
+
+rxjs                       ~7.8.0    https://www.npmjs.com/package/rxjs
+  Observables returned by HttpClient.
+
+zone.js                    ~0.15.0   https://www.npmjs.com/package/zone.js
+  Angular change detection.
+
+tslib                      ^2.3.0    https://www.npmjs.com/package/tslib
+  Helper functions emitted by the TypeScript compiler.
+
+
+--------------------------------------------------------------------------------
+4. FRONTEND - development dependencies (frontend/package.json)
+--------------------------------------------------------------------------------
+@angular/cli               ^20.3.6   https://www.npmjs.com/package/@angular/cli
+  "ng serve" / "ng build" commands.
+
+@angular/build             ^20.3.6   https://www.npmjs.com/package/@angular/build
+  Build system (esbuild/Vite based) used by the CLI.
+
+@angular/compiler-cli      ^20.3.0   https://www.npmjs.com/package/@angular/compiler-cli
+  Ahead-of-time template compilation during the build.
+
+typescript                 ~5.9.2    https://www.npmjs.com/package/typescript
+  TypeScript compiler for the Angular application.
+
+jasmine-core               ~5.9.0    https://www.npmjs.com/package/jasmine-core
+@types/jasmine             ~5.1.0    https://www.npmjs.com/package/@types/jasmine
+karma                      ~6.4.0    https://www.npmjs.com/package/karma
+karma-chrome-launcher      ~3.2.0    https://www.npmjs.com/package/karma-chrome-launcher
+karma-coverage             ~2.2.0    https://www.npmjs.com/package/karma-coverage
+karma-jasmine              ~5.1.0    https://www.npmjs.com/package/karma-jasmine
+karma-jasmine-html-reporter ~2.1.0   https://www.npmjs.com/package/karma-jasmine-html-reporter
+  Default Angular test setup ("ng test"). Not used by the application itself.
+
+
+--------------------------------------------------------------------------------
+5. HOW TO INSTALL AND RUN
+--------------------------------------------------------------------------------
+1) Install Node.js and MongoDB (see section 0) and start the MongoDB service.
+
+2) Backend:
+     cd printing_house/backend
+     npm install
+     npm run seed      (creates and fills the printingHouse2026 database)
+     npm run build
+     npm start         (API on http://localhost:4000)
+
+3) Frontend:
+     cd printing_house/frontend
+     npm install
+     npm start         (application on http://localhost:4200)
+
+No library is loaded from a CDN - everything is installed through npm.

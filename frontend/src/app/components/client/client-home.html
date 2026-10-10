@@ -1,0 +1,27 @@
+<div class="app-shell">
+  <app-header-client />
+
+  <main class="page">
+    <h1>Welcome, {{ user?.name }} {{ user?.surname }}</h1>
+    <p class="lead">Choose what you would like to do.</p>
+
+    <div class="card">
+      <div class="btn-row">
+        <a class="btn" routerLink="/client/profile">Profile and orders</a>
+        @if (isLegalEntity) {
+          <a class="btn" routerLink="/client/request-search">Search products</a>
+          <a class="btn" routerLink="/client/cart">Current request</a>
+        } @else {
+          <a class="btn" routerLink="/client/search">Search products</a>
+          <a class="btn" routerLink="/client/cart">Cart</a>
+        }
+        <a class="btn" routerLink="/client/archive">Product archive</a>
+        @if (isLegalEntity) {
+          <a class="btn" routerLink="/client/procurements">Public procurement</a>
+        }
+      </div>
+    </div>
+  </main>
+
+  <app-footer />
+</div>

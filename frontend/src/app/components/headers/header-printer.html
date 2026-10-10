@@ -1,0 +1,18 @@
+<header class="app-header">
+  <a class="brand" routerLink="/printer">Printing House</a>
+
+  <nav class="menu">
+    <a routerLink="/printer">Home</a>
+    <a routerLink="/printer/profile">Profile</a>
+    <a routerLink="/printer/products">Products and services</a>
+    <a routerLink="/printer/stock">Stock</a>
+    <a routerLink="/printer/orders">Ordered products</a>
+    <a routerLink="/printer/bids">Bidding</a>
+  </nav>
+
+  <div class="session">
+    <span class="who">{{ username }}</span>
+    <span class="muted-light">{{ institutionName }}</span>
+    <button type="button" class="btn btn-link" (click)="logout()">Log out</button>
+  </div>
+</header>

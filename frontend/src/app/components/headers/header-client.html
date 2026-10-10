@@ -1,0 +1,26 @@
+<header class="app-header">
+  <a class="brand" routerLink="/client">Printing House</a>
+
+  <nav class="menu">
+    <a routerLink="/client">Home</a>
+    <a routerLink="/client/profile">Profile</a>
+    @if (isLegalEntity) {
+      <a routerLink="/client/request-search">Search products</a>
+    } @else {
+      <a routerLink="/client/search">Search products</a>
+    }
+    <a routerLink="/client/cart">Cart</a>
+    <a routerLink="/client/archive">Archive</a>
+    @if (isLegalEntity) {
+      <a routerLink="/client/procurements">Public procurement</a>
+    }
+  </nav>
+
+  <div class="session">
+    <span class="who">{{ username }}</span>
+    @if (institutionName) {
+      <span class="muted-light">{{ institutionName }}</span>
+    }
+    <button type="button" class="btn btn-link" (click)="logout()">Log out</button>
+  </div>
+</header>

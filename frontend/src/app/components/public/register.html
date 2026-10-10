@@ -1,0 +1,134 @@
+<div class="app-shell">
+  <app-header-public />
+
+  <main class="page">
+    <h1>Registration</h1>
+    <p class="lead">A new account becomes usable once the administrator approves it.</p>
+
+    <div class="card">
+
+      @if (!registered) {
+        <form (ngSubmit)="register()">
+
+          <div class="form-row">
+            <label for="type">Type of account</label>
+            <select id="type" name="type" [(ngModel)]="user.type" required>
+              <option value="">Choose...</option>
+              @for (type of registrableTypes; track type) {
+                <option [value]="type">{{ typeLabels[type] }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-row">
+              <label for="username">Username</label>
+              <input id="username" type="text" name="username" [(ngModel)]="user.username" required />
+              <span class="hint">Cannot be changed later.</span>
+            </div>
+
+            <div class="form-row">
+              <label for="password">Password</label>
+              <input id="password" type="password" name="password" [(ngModel)]="user.password" required />
+              <span class="hint">{{ passwordRule }}</span>
+            </div>
+
+            <div class="form-row">
+              <label for="name">Name</label>
+              <input id="name" type="text" name="name" [(ngModel)]="user.name" required />
+              @if (isInstitution) {
+                <span class="hint">Name of the responsible person.</span>
+              }
+            </div>
+
+            <div class="form-row">
+              <label for="surname">Surname</label>
+              <input id="surname" type="text" name="surname" [(ngModel)]="user.surname" required />
+              @if (isInstitution) {
+                <span class="hint">Surname of the responsible person.</span>
+              }
+            </div>
+
+            <div class="form-row">
+              <label for="phone">Contact telephone</label>
+              <input id="phone" type="text" name="phone" [(ngModel)]="user.phone" required />
+            </div>
+
+            <div class="form-row">
+              <label for="email">E-mail address</label>
+              <input id="email" type="text" name="email" [(ngModel)]="user.email" required />
+              <span class="hint">At most one account per e-mail address.</span>
+            </div>
+          </div>
+
+          @if (isInstitution) {
+            <h2>Institution</h2>
+            <p class="lead">
+              If an institution with this registration number already exists, this account is
+              added to it and shares its data with its other employees. Otherwise a new
+              institution is created from what you enter here.
+            </p>
+
+            <div class="form-grid">
+              <div class="form-row">
+                <label for="institution_name">Institution name</label>
+                <input id="institution_name" type="text" name="institution_name" [(ngModel)]="user.institution_name" required />
+              </div>
+
+              <div class="form-row">
+                <label for="address">Address of the head office</label>
+                <input id="address" type="text" name="address" [(ngModel)]="user.address" required />
+              </div>
+
+              <div class="form-row">
+                <label for="city">City</label>
+                <input id="city" type="text" name="city" [(ngModel)]="user.city" required />
+              </div>
+
+              <div class="form-row">
+                <label for="registration_number">Registration number</label>
+                <input id="registration_number" type="text" name="registration_number" [(ngModel)]="user.registration_number" required />
+                <span class="hint">Exactly 8 digits. Identifies the institution you belong to.</span>
+              </div>
+
+              <div class="form-row">
+                <label for="tax_id">Tax identification number</label>
+                <input id="tax_id" type="text" name="tax_id" [(ngModel)]="user.tax_id" required />
+                <span class="hint">9 digits, cannot start with a zero.</span>
+              </div>
+            </div>
+          }
+
+          <div class="form-row">
+            <label for="profile_image">Profile picture</label>
+            <input id="profile_image" type="file" name="profile_image"
+                   accept="image/jpeg,image/png,image/gif" (change)="onFileSelected($event)" />
+            <span class="hint">
+              JPG, PNG or GIF, between {{ minPx }}x{{ minPx }} and {{ maxPx }}x{{ maxPx }} pixels.
+              Leave it empty to get the default picture.
+            </span>
+          </div>
+
+          <div class="btn-row">
+            <button type="submit" class="btn">Register</button>
+            <button type="button" class="btn btn-secondary" (click)="backToLogin()">Back to sign in</button>
+          </div>
+        </form>
+      }
+
+      @if (message) {
+        <div class="message" [class.message-error]="isError" [class.message-success]="!isError">
+          {{ message }}
+        </div>
+      }
+
+      @if (registered) {
+        <div class="btn-row">
+          <button type="button" class="btn" (click)="backToLogin()">Back to sign in</button>
+        </div>
+      }
+    </div>
+  </main>
+
+  <app-footer />
+</div>

@@ -1,0 +1,23 @@
+<div class="app-shell">
+  <app-header-printer />
+
+  <main class="page">
+    <h1>{{ user?.institution?.name }}</h1>
+    <p class="lead">
+      Welcome, {{ user?.name }} {{ user?.surname }}. Products, stock and orders are shared
+      with everybody who works at this print shop.
+    </p>
+
+    <div class="card">
+      <div class="btn-row">
+        <a class="btn" routerLink="/printer/profile">Profile</a>
+        <a class="btn" routerLink="/printer/products">Products and services</a>
+        <a class="btn" routerLink="/printer/stock">Update stock</a>
+        <a class="btn" routerLink="/printer/orders">Ordered products</a>
+        <a class="btn" routerLink="/printer/bids">Bidding</a>
+      </div>
+    </div>
+  </main>
+
+  <app-footer />
+</div>

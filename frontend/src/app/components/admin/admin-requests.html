@@ -1,0 +1,100 @@
+<div class="app-shell">
+  <app-header-admin />
+
+  <main class="page">
+    <h1>Registration requests</h1>
+    <p class="lead">
+      Accounts waiting to be approved, oldest first. Until a request is accepted the
+      account cannot sign in.
+    </p>
+
+    @if (message) {
+      <div class="message" [class.message-error]="isError" [class.message-success]="!isError">
+        {{ message }}
+      </div>
+    }
+
+    @if (loaded && requests.length === 0) {
+      <div class="card">
+        <p class="empty">There are no registration requests waiting.</p>
+      </div>
+    } @else {
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Username</th>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Institution</th>
+              <th>Contact</th>
+              <th>Requested</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (request of requests; track request.username) {
+              <tr>
+                <td class="center">
+                  <img class="avatar avatar-small"
+                       [src]="uploadsUrl + '/' + request.profile_image" [alt]="request.username" />
+                </td>
+                <td><strong>{{ request.username }}</strong></td>
+                <td>{{ request.name }} {{ request.surname }}</td>
+                <td class="center">{{ typeLabels[request.type] }}</td>
+                <td>
+                  @if (request.institution) {
+                    <strong>{{ request.institution.name }}</strong>
+                    <div class="muted">
+                      {{ request.institution.address }}, {{ request.institution.city }}
+                    </div>
+                    <div class="muted">
+                      registration number {{ request.institution._id }} &middot;
+                      tax id {{ request.institution.tax_id }}
+                    </div>
+                  } @else {
+                    <span class="muted">-</span>
+                  }
+                </td>
+                <td>
+                  {{ request.email }}
+                  <div class="muted">{{ request.phone }}</div>
+                </td>
+                <td class="center">{{ request.registered_at.substring(0, 10) }}</td>
+                <td class="center">
+                  <button type="button" class="btn" (click)="accept(request)">Accept</button>
+                  <button type="button" class="btn btn-danger" (click)="reject(request)">Reject</button>
+                </td>
+              </tr>
+
+              @if (isInstitution(request)) {
+                <tr>
+                  <td colspan="8">
+                    @if (isJoiningExisting(request)) {
+                      <div class="message message-error">
+                        <strong>This account wants to join an existing institution.</strong>
+                        {{ request.institution?.name }} already has these accounts:
+                        {{ request.colleagues?.join(', ') }}.
+                        A registration number is public information, so check that this
+                        person really works there before accepting - once accepted they
+                        share the same products, invoices and procurements.
+                      </div>
+                    } @else {
+                      <div class="message message-success">
+                        This account would be the first of {{ request.institution?.name }},
+                        so accepting it creates that institution in the system.
+                      </div>
+                    }
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </main>
+
+  <app-footer />
+</div>

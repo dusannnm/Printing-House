@@ -1,0 +1,16 @@
+<header class="app-header">
+  <a class="brand" routerLink="/admin">Printing House</a>
+
+  <nav class="menu">
+    <a routerLink="/admin">Home</a>
+    <a routerLink="/admin/users">User accounts</a>
+    <a routerLink="/admin/requests">Registration requests</a>
+    <a routerLink="/admin/categories">Categories</a>
+    <a routerLink="/admin/statistics">Statistics</a>
+  </nav>
+
+  <div class="session">
+    <span class="who">{{ username }}</span>
+    <button type="button" class="btn btn-link" (click)="logout()">Log out</button>
+  </div>
+</header>

@@ -1,0 +1,176 @@
+<div class="app-shell">
+  <app-header-client />
+
+  <main class="page">
+    <h1>Profile</h1>
+    <p class="lead">Everything except the username can be changed.</p>
+
+    <div class="card">
+      <div class="profile-layout">
+        <div>
+          <img class="avatar" [src]="uploadsUrl + '/' + user.profile_image" alt="Profile picture" />
+          <div class="form-row">
+            <label for="profile_image">Change picture</label>
+            <input id="profile_image" type="file" name="profile_image"
+                   accept="image/jpeg,image/png,image/gif" (change)="onFileSelected($event)" />
+            <span class="hint">JPG, PNG or GIF, {{ minPx }}x{{ minPx }} to {{ maxPx }}x{{ maxPx }} pixels.</span>
+          </div>
+        </div>
+
+        <form (ngSubmit)="save()">
+          <div class="form-grid">
+            <div class="form-row">
+              <label for="username">Username</label>
+              <input id="username" type="text" name="username" [value]="user.username" disabled />
+              <span class="hint">Cannot be changed.</span>
+            </div>
+
+            <div class="form-row">
+              <label for="name">Name</label>
+              <input id="name" type="text" name="name" [(ngModel)]="user.name" required />
+            </div>
+
+            <div class="form-row">
+              <label for="surname">Surname</label>
+              <input id="surname" type="text" name="surname" [(ngModel)]="user.surname" required />
+            </div>
+
+            <div class="form-row">
+              <label for="phone">Contact telephone</label>
+              <input id="phone" type="text" name="phone" [(ngModel)]="user.phone" required />
+            </div>
+
+            <div class="form-row">
+              <label for="email">E-mail address</label>
+              <input id="email" type="text" name="email" [(ngModel)]="user.email" required />
+            </div>
+          </div>
+
+          @if (isInstitution) {
+            <h2>Institution</h2>
+            <p class="lead">
+              This data is shared with everybody who works at
+              {{ user.institution_name }} - changing it changes it for all of them.
+            </p>
+
+            <div class="form-grid">
+              <div class="form-row">
+                <label for="institution_name">Institution name</label>
+                <input id="institution_name" type="text" name="institution_name"
+                       [(ngModel)]="user.institution_name" required />
+              </div>
+
+              <div class="form-row">
+                <label for="address">Address of the head office</label>
+                <input id="address" type="text" name="address" [(ngModel)]="user.address" required />
+              </div>
+
+              <div class="form-row">
+                <label for="city">City</label>
+                <input id="city" type="text" name="city" [(ngModel)]="user.city" required />
+              </div>
+
+              <div class="form-row">
+                <label for="registration_number">Registration number</label>
+                <input id="registration_number" type="text" [value]="user.registration_number" disabled />
+                <span class="hint">Identifies the institution and cannot be changed.</span>
+              </div>
+
+              <div class="form-row">
+                <label for="tax_id">Tax identification number</label>
+                <input id="tax_id" type="text" [value]="user.tax_id" disabled />
+                <span class="hint">Cannot be changed.</span>
+              </div>
+            </div>
+          }
+
+          <div class="btn-row">
+            <button type="submit" class="btn">Save</button>
+          </div>
+        </form>
+      </div>
+
+      @if (message) {
+        <div class="message" [class.message-error]="isError" [class.message-success]="!isError">
+          {{ message }}
+        </div>
+      }
+    </div>
+
+    <h2>Orders</h2>
+    <p class="lead">
+      @if (isInstitution) {
+        Every invoice of {{ user.institution_name }}, whoever placed it.
+      } @else {
+        All previous and current orders. Click a column header to sort.
+      }
+    </p>
+
+    @if (orders.length === 0) {
+      <div class="card"><p class="empty">There are no orders yet.</p></div>
+    } @else {
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="sortable" (click)="sortBy('invoice_id')">Invoice ID</th>
+              <th class="sortable" (click)="sortBy('printer_name')">Print shop</th>
+              <th class="sortable" (click)="sortBy('printer_city')">City</th>
+              <th>Ordered products</th>
+              <th class="sortable" (click)="sortBy('total_amount')">Total</th>
+              <th class="sortable" (click)="sortBy('status')">Status</th>
+              <th class="sortable" (click)="sortBy('ordered_at')">Ordered</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (order of orders; track order.invoice_id) {
+              <tr>
+                <td class="center">{{ order.invoice_id }}</td>
+                <td>{{ order.printer_name }}</td>
+                <td class="center">{{ order.printer_city }}</td>
+                <td>
+                  <ol class="item-list">
+                    @for (item of order.items; track item.product_code) {
+                      <li>{{ item.product_name }} ({{ item.quantity }})</li>
+                    }
+                  </ol>
+                </td>
+                <td class="center"><strong>{{ order.total_amount }}</strong> RSD</td>
+                <td class="center">{{ statusLabels[order.status] }}</td>
+                <td class="center">{{ order.ordered_at.substring(0, 10) }}</td>
+                <td class="center">
+                  @if (order.status === ORDERED) {
+                    <button type="button" class="btn btn-danger" (click)="askCancel(order)">Cancel</button>
+                  }
+                </td>
+              </tr>
+
+              @if (cancelling === order.invoice_id) {
+                <tr>
+                  <td colspan="8">
+                    <div class="message message-error">
+                      Cancel invoice <strong>{{ order.invoice_id }}</strong> from
+                      {{ order.printer_name }}? The products go back on stock and the
+                      invoice stays in this table marked as cancelled.
+                      <div class="btn-row">
+                        <button type="button" class="btn btn-danger" (click)="confirmCancel(order)">
+                          Yes, cancel it
+                        </button>
+                        <button type="button" class="btn btn-secondary" (click)="cancelCancel()">
+                          Keep the order
+                        </button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </main>
+
+  <app-footer />
+</div>
