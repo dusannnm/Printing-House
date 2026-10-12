@@ -187,4 +187,4 @@ the PDF report of procurement offers. -->
 
 ## Author
 
-Dušan Milivojević, Programiranje internet aplikacija, 2025/26.
+Dušan Milivojević, 2025/26.
